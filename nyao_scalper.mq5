@@ -186,7 +186,8 @@ input double EquityDropPercent = 5.0;                     // Equity Drop % per L
 input int MaxEquityDropLotSteps = 2;                      // Max Drawdown-Based Lot Steps (0 = Unlimited)
 input double MinSignalStrengthForLot = 8.0;               // Min Signal Score for Lot Increase
 input double LotStepSize = 0.01;                          // Lot Increase Step Size
-input double MaxLotSize = 0.05;                           // Max Lot Size
+input double MinLotSize = 0.01;
+input double MaxLotSize = 100.0;                           // Max Lot Size
 
 input group "🏦 Equity Settings"
 input bool EnableBasketStop = true;                       // Close All When Total Floating Loss Exceeds Limit
@@ -4345,10 +4346,25 @@ int CountOpenOrdersByType(ENUM_POSITION_TYPE posType)
 //+-------------------------------------------------------------------+
 double CalculateDynamicLotSize(double signalScore = 0)
 {
-    if(!EnableDynamicLots) return BaseLotSize;
+   if(!EnableDynamicLots) return BaseLotSize;
     
-    double currentLot = BaseLotSize;
-    double currentEquity = AccountInfoDouble(ACCOUNT_EQUITY);
+   // double currentLot = BaseLotSize;
+   double balance = AccountInfoDouble(ACCOUNT_BALANCE);
+
+   // 0.01 lot per $300
+   double baseLot = MathFloor(balance / 300.0) * 0.01;
+   
+   // Never go below 0.01
+   baseLot = MathMax(baseLot, MinLotSize);
+
+   // 0.01 lot per $300
+   double currentLot = baseLot;
+   
+   currentLot = MathMin(currentLot, MaxLotSize);
+
+   if(currentLot < BaseLotSize)
+      currentLot = BaseLotSize;
+      double currentEquity = AccountInfoDouble(ACCOUNT_EQUITY);
     
     // Calculate equity drop from peak as percentage
     double equityDropPercent = 0;
@@ -5752,7 +5768,17 @@ void UpdateDashboard()
     // Status logic
     string status = "Active";
     color statusColor = clrLime;
-    if(isPaused) { status = "PAUSED (" + IntegerToString(currentPauseDuration) + "m)"; statusColor = clrOrange; }
+    // if(isPaused) {
+    //   status = "PAUSED (" + IntegerToString(currentPauseDuration) + "m)";
+    //   statusColor = clrOrange;
+    // }
+    if(isPaused) {
+      int elapsedMinutes = (int)((TimeTradeServer() - pauseStartTime) / 60);
+      int remainingMinutes = MathMax(0, currentPauseDuration - elapsedMinutes);
+
+      status = "PAUSED (" + IntegerToString(remainingMinutes) + "m)";
+      statusColor = clrOrange;
+    }
     else if(isOutsideTradingHours) { status = "Closed (Time)"; statusColor = clrGray; }
     else if(targetEquityReached) { status = "STOPPED (Target)"; statusColor = clrRed; }
     else if(minimumEquityReached) { status = "STOPPED (Min Equity)"; statusColor = clrRed; }

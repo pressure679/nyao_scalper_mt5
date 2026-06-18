@@ -4358,7 +4358,7 @@ double CalculateDynamicLotSize(double signalScore = 0)
    // Never go below 0.01
    baseLot = MathMax(baseLot, MinLotSize);
 
-   // 0.01 lot per $300
+   // 0.5% risk
    double currentLot = baseLot;
    
    currentLot = MathMin(currentLot, MaxLotSize);

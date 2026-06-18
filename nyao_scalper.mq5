@@ -62,11 +62,11 @@ input group "+-----------------------------------------+"
 // +------------------------------------------------------------------+
 input group "📊 Indicator Settings"
 input int DirectionalBodyLookback = 10;                   // Lookback for directional body analysis
-input int EMAFastPeriod = 5;                              // EMA Fast Period
-input int EMASlowPeriod = 12;                             // EMA Slow Period
+input int EMAFastPeriod = 7;                              // EMA Fast Period
+input int EMASlowPeriod = 21;                             // EMA Slow Period
 input int SlopeLookback = 3;                              // EMA Slope Lookback Bars (noise reduction)
-input int RSIPeriod = 8;                                  // RSI Period
-input int ATRPeriod = 8;                                  // ATR Period
+input int RSIPeriod = 7;                                  // RSI Period
+input int ATRPeriod = 7;                                  // ATR Period
 input int ATRAvgLookback = 10;                            // ATR Average Lookback
 input double MinVolRatioToTrade = 0.6;                    // Min ATR/AvgATR Ratio to Trade (0 = Disabled, blocks dead market)
 input int ImpulseLookback = 3;                            // Impulse Lookback
@@ -181,7 +181,7 @@ input bool HedgeClearRootSL = true;                       // Clear First Positio
 input double HedgeTrailATR = 0.5;                         // Graduated Hedge Trail Distance (ATR; 0 = normal trailing)
 
 input group "🧮 Dynamic Lot Sizing Settings"
-input bool EnableDynamicLots = true;                      // Enable Dynamic Lot Sizing
+input bool EnableDynamicLots = false;                      // Enable Dynamic Lot Sizing
 input double EquityDropPercent = 5.0;                     // Equity Drop % per Lot Step
 input int MaxEquityDropLotSteps = 2;                      // Max Drawdown-Based Lot Steps (0 = Unlimited)
 input double MinSignalStrengthForLot = 8.0;               // Min Signal Score for Lot Increase
@@ -204,8 +204,8 @@ input double MinimumEquity = 20;                          // Min Equity - Stop T
 
 input group "📈 Take Profit Settings"
 input bool EnableTakeProfit = false;                      // Enable Take Profit
-input ENUM_INPUT_TYPE TPInputType = INPUT_DOLLAR;         // TP Input Type
-input double TPValue = 10.0;                              // TP Value
+input ENUM_INPUT_TYPE TPInputType = INPUT_POINTS;         // TP Input Type
+input double TPValue = 200.0;                              // TP Value
 
 input group "📉 Stop Loss Settings"
 input bool EnableStopLoss = true;                         // Enable Stop Loss
@@ -226,9 +226,9 @@ input bool TrailingEnableBreakEvenLock = true;            // Enable Trailing Bre
 input bool TrailingSLOnProfitableOnly = true;             // Trailing SL on Profitable Position Only
 input bool EnableAdaptiveTP = true;                       // Enable Adaptive TP
 input bool EnableAdaptiveSL = true;                       // Enable Adaptive SL
-input ENUM_INPUT_TYPE TSInputType = INPUT_DOLLAR;         // Trailing Distance Input Type
-input double TrailingDistanceValue = 0.2;                 // Trailing Distance Value
-input double TrailingValueMultiplier = 0.2;               // Trailing Value Multiplier
+input ENUM_INPUT_TYPE TSInputType = INPUT_POINTS;         // Trailing Distance Input Type
+input double TrailingDistanceValue = 2;                 // Trailing Distance Value
+input double TrailingValueMultiplier = 2;               // Trailing Value Multiplier
 
 input group "🤖 Robot Settings"
 input int MagicNumber = 6926268;                          // Magic Number
@@ -236,7 +236,7 @@ input bool EnableDiscordAlerts = false;                   // Enable Discord Aler
 input string DiscordWebhookURL = "";                      // Discord Webhook URL
 input bool EnableTradingHours = false;                    // Enable Trading Hours
 input string TradingStartTime = "00:00";                  // Trading Start Time (HH:MM)
-input string TradingEndTime = "23:59";                    // Trading End Time (HH:MM)
+input string TradingEndTime = "23:00";                    // Trading End Time (HH:MM)
 input bool EnableReports = true;                          // Enable Trading Reports
 input int SendReportEveryHour = 1;                        // Send Report Every (n) Hours 
 input bool EnableMarketCloseFilter = true;                // Stop Opening New Positions Near Market Close Hour
@@ -4351,8 +4351,9 @@ double CalculateDynamicLotSize(double signalScore = 0)
    // double currentLot = BaseLotSize;
    double balance = AccountInfoDouble(ACCOUNT_BALANCE);
 
-   // 0.01 lot per $300
-   double baseLot = MathFloor(balance / 300.0) * 0.01;
+   double riskAmount = balance * 0.005;
+   
+   double baseLot = riskAmount / (500 * 0.1);
    
    // Never go below 0.01
    baseLot = MathMax(baseLot, MinLotSize);

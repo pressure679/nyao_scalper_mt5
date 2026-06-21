@@ -4353,7 +4353,7 @@ double CalculateDynamicLotSize(double signalScore = 0)
 
    double riskAmount = balance * 0.005;
    
-   double baseLot = riskAmount / (500 * 0.01);
+   double baseLot = NormalizeDouble(riskAmount / (500 * 0.1) / 100, 2);
    
    // Never go below 0.01
    baseLot = MathMax(baseLot, MinLotSize);

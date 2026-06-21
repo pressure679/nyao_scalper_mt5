@@ -181,7 +181,7 @@ input bool HedgeClearRootSL = true;                       // Clear First Positio
 input double HedgeTrailATR = 0.5;                         // Graduated Hedge Trail Distance (ATR; 0 = normal trailing)
 
 input group "🧮 Dynamic Lot Sizing Settings"
-input bool EnableDynamicLots = false;                      // Enable Dynamic Lot Sizing
+input bool EnableDynamicLots = true;                      // Enable Dynamic Lot Sizing
 input double EquityDropPercent = 5.0;                     // Equity Drop % per Lot Step
 input int MaxEquityDropLotSteps = 2;                      // Max Drawdown-Based Lot Steps (0 = Unlimited)
 input double MinSignalStrengthForLot = 8.0;               // Min Signal Score for Lot Increase

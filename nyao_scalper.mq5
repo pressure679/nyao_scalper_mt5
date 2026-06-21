@@ -74,8 +74,8 @@ input double ImpulseBoostWeight = 1.0;                    // Impulse Boost Weigh
 input int SignalSmoothingCandles = 2;                     // Closed Candles for Weighted Average (1-10)
 input double CurrentCandleBlend = 0.40;                   // Current Candle Blend Factor (0.0-1.0)
 input double VelocityWindow = 2.0;                        // Velocity Window (Score Delta)
-input int RSIOverbought = 80;                             // RSI Overbought Level (Max Buy)
-input int RSIOversold = 20;                               // RSI Oversold Level (Min Sell)
+input int RSIOverbought = 70;                             // RSI Overbought Level (Max Buy)
+input int RSIOversold = 30;                               // RSI Oversold Level (Min Sell)
 input int RSIMomentumBuy = 60;                            // RSI Momentum Buy Trigger
 input int RSIMomentumSell = 40;                           // RSI Momentum Sell Trigger
 
